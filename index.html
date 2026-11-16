@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedInfo Wiki | 醫療資訊與臨床實務模組化知識庫</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* =========================================================
+       嚴格對應 AGENTS.md 第 2 節：Design System & CSS Variables
+       ========================================================= */
+    :root {
+      --primary: #0f766e;
+      --primary-hover: #115e59;
+      --primary-light: #f0fdfa;
+      --bg-main: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-sidebar: #0f172a;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border-color: #e2e8f0;
+      --status-normal-text: #166534;
+      --status-normal-bg: #dcfce7;
+      --status-warn-text: #9a3412;
+      --status-warn-bg: #ffedd5;
+      --status-alert-text: #991b1b;
+      --status-alert-bg: #fee2e2;
+      --radius-card: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.65;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    code, .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* =========================================================
+       側邊導覽列 (.wiki-sidebar)
+       ========================================================= */
+    .wiki-sidebar {
+      width: 300px;
+      background-color: var(--bg-sidebar);
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      border-right: 1px solid #1e293b;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .brand-box {
+      padding: 24px 20px 18px;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .brand-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #5eead4;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-sub {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    .search-box {
+      padding: 14px 20px;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background-color: #1e293b;
+      color: #f8fafc;
+      font-size: 0.88rem;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: #2dd4bf;
+    }
+
+    .sidebar-nav {
+      padding: 16px 14px;
+      flex: 1;
+    }
+
+    .nav-group-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #64748b;
+      padding: 10px 10px 6px;
+      font-weight: 700;
+    }
+
+    .nav-list {
+      list-style: none;
+      margin-bottom: 14px;
+    }
+
+    .nav-item-btn {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: none;
+      color: #cbd5e1;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      transition: all 0.18s ease;
+      font-family: inherit;
+    }
+
+    .nav-item-btn:hover {
+      background-color: #1e293b;
+      color: #ffffff;
+    }
+
+    .nav-item-btn.active {
+      background-color: var(--primary);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .nav-item-id {
+      font-size: 0.72rem;
+      opacity: 0.75;
+    }
+
+    .sidebar-footer {
+      padding: 14px 20px;
+      border-top: 1px solid #1e293b;
+      font-size: 0.78rem;
+      color: #94a3b8;
+    }
+
+    /* =========================================================
+       主內容區 (.wiki-main) 與頂部控制列
+       ========================================================= */
+    .wiki-main {
+      flex: 1;
+      max-width: 1020px;
+      margin: 0 auto;
+      padding: 28px 36px 60px;
+      width: 100%;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .stats-bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .stat-pill {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-weight: 500;
+    }
+
+    .rule-toggle-btn {
+      background-color: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid #99f6e4;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .rule-toggle-btn:hover {
+      background-color: #ccfbf1;
+    }
+
+    /* AGENTS.md 規範對照標示模式 */
+    body.show-spec-tags [data-spec]::before {
+      content: "AGENTS.md 規範區塊：" attr(data-spec);
+      display: inline-block;
+      background: #0f172a;
+      color: #5eead4;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.74rem;
+      padding: 3px 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    body.show-spec-tags [data-spec] {
+      outline: 2px dashed #0d9488;
+      outline-offset: 4px;
+    }
+
+    /* =========================================================
+       嚴格對應 AGENTS.md 第 4 節：四大標準 DOM 區塊
+       ========================================================= */
+    /* 區塊 A：.lesson-header */
+    .lesson-header {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-card);
+      padding: 24px 28px;
+      margin-bottom: 22px;
+    }
+
+    .category-badge {
+      display: inline-block;
+      background-color: var(--primary-light);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    .lesson-title {
+      font-size: 1.65rem;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      line-height: 1.35;
+    }
+
+    .lesson-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      align-items: center;
+    }
+
+    .tag-chip {
+      background: #f1f5f9;
+      color: #334155;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+    }
+
+    /* 區塊 B：.section-definition */
+    .section-definition {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-card);
+      padding: 24px 28px;
+      margin-bottom: 22px;
+    }
+
+    .section-heading {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .callout-card {
+      background-color: var(--primary-light);
+      border-left: 4px solid var(--primary);
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      color: #134e4a;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .metric-card {
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 14px 16px;
+      background-color: #fcfcfd;
+    }
+
+    .metric-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .metric-value {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--primary);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .metric-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* 區塊 C：.section-matrix */
+    .section-matrix {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-card);
+      padding: 24px 28px;
+      margin-bottom: 22px;
+      overflow-x: auto;
+    }
+
+    .wiki-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      margin-top: 8px;
+    }
+
+    .wiki-table th {
+      background-color: #f1f5f9;
+      color: var(--text-main);
+      text-align: left;
+      padding: 12px 14px;
+      font-weight: 700;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .wiki-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: top;
+    }
+
+    .wiki-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge-normal, .badge-warn, .badge-alert {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge-normal {
+      color: var(--status-normal-text);
+      background-color: var(--status-normal-bg);
+    }
+
+    .badge-warn {
+      color: var(--status-warn-text);
+      background-color: var(--status-warn-bg);
+    }
+
+    .badge-alert {
+      color: var(--status-alert-text);
+      background-color: var(--status-alert-bg);
+    }
+
+    /* 區塊 D：.section-qa */
+    .section-qa {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-card);
+      padding: 24px 28px;
+      margin-bottom: 22px;
+    }
+
+    .qa-item {
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 14px;
+      background-color: #ffffff;
+    }
+
+    .qa-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .qa-question {
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+      font-size: 0.98rem;
+    }
+
+    .qa-answer {
+      color: var(--text-main);
+      font-size: 0.92rem;
+    }
+
+    /* AGENTS.md 擴充指南面板 */
+    .agent-guide-box {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: var(--radius-card);
+      padding: 20px 24px;
+      font-size: 0.88rem;
+    }
+
+    .agent-guide-title {
+      color: #5eead4;
+      font-weight: 700;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .prompt-example {
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-top: 8px;
+      color: #f8fafc;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+    }
+
+    @media (max-width: 860px) {
+      body {
+        flex-direction: column;
+      }
+      .wiki-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+      .wiki-main {
+        padding: 20px 16px 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 左側導覽列：嚴格對應 AGENTS.md 分類前綴規則 (lab- / policy- / ai-) -->
+  <aside class="wiki-sidebar">
+    <div class="brand-box">
+      <div class="brand-title">🩺 MedInfo Wiki</div>
+      <div class="brand-sub">醫療資訊與臨床實務模組化知識庫</div>
+    </div>
+
+    <div class="search-box">
+      <input type="text" id="searchInput" class="search-input" placeholder="搜尋單元標題、ID 或關鍵字..." />
+    </div>
+
+    <nav class="sidebar-nav" id="sidebarNav">
+      <!-- 由 JavaScript 根據 WIKI_LESSONS 自動依規則渲染 -->
+    </nav>
+
+    <div class="sidebar-footer">
+      <div>架構規範：<code class="mono">AGENTS.md v1.0</code></div>
+      <div style="margin-top:4px;">開發者：高醫醫資 余宇翔</div>
+    </div>
+  </aside>
+
+  <!-- 右側主要內容檢視區 -->
+  <main class="wiki-main">
+    <div class="topbar">
+      <div class="stats-bar">
+        <span class="stat-pill" id="lessonCountPill">已收錄 3 篇標準單元</span>
+        <span class="stat-pill">遵循 <code class="mono">AGENTS.md</code> 三段式結構</span>
+      </div>
+      <button type="button" class="rule-toggle-btn" id="toggleSpecBtn">
+        🔍 顯示 AGENTS.md 區塊對應標籤
+      </button>
+    </div>
+
+    <!-- 動態渲染的標準講義容器 -->
+    <article id="lessonContainer"></article>
+
+    <!-- 底部提示：如何讓 AI 依照 AGENTS.md 繼續新增單元 -->
+    <section class="agent-guide-box">
+      <div class="agent-guide-title">🤖 如何利用 AGENTS.md 讓 AI 自動擴充新單元？</div>
+      <div>未來只需將專案中的 <code>AGENTS.md</code> 提供給 AI，並下達以下標準指令，AI 即可自動對齊命名規範、三段式 DOM 結構與色彩變數：</div>
+      <div class="prompt-example">
+        「請閱讀專案中的 AGENTS.md 規範，幫我在 WIKI_LESSONS 新增一篇臨床檢驗單元（ID: lab-hba1c），主題為『糖化血色素 (HbA1c) 臨床判讀與糖尿病管理』，並完整包含核心定義卡、4 欄判讀矩陣表與 2 題實務 QA。」
+      </div>
+    </section>
+  </main>
+
+  <script>
+    /* =========================================================
+       嚴格遵守 AGENTS.md 第 3 & 4 節定義之標準化單元資料結構
+       未來 AI 新增單元僅需在此陣列依相同 Schema 加入物件即可自動擴充
+       ========================================================= */
+    const WIKI_LESSONS = [
+      {
+        id: "lab-hemoglobin",
+        categoryKey: "lab",
+        categoryName: "臨床檢驗判讀",
+        title: "血紅素（Hemoglobin, Hb）異常判讀與貧血分類",
+        updatedAt: "2026-11-16",
+        tags: ["CBC全血球計數", "貧血分類", "MCV平均紅血球體積", "紅血球增多症"],
+        definition: "血紅素（Hemoglobin, Hb）是紅血球內負責攜帶氧氣至全身組織的核心蛋白質。在臨床檢驗與醫療資訊系統（LIS）警示邏輯設計中，Hb 是評估貧血（Anemia）與紅血球增多症（Erythrocytosis）的首要指標，並需搭配平均紅血球體積（MCV）與網狀紅血球計數（Reticulocyte）進行病因分流。",
+        metrics: [
+          { label: "成年男性正常參考值", value: "13.5 - 17.5 g/dL", note: "低於 13.5 g/dL 定義為男性貧血" },
+          { label: "成年女性正常參考值", value: "12.0 - 15.5 g/dL", note: "低於 12.0 g/dL 定義為女性貧血" },
+          { label: "臨床危急值通報門檻", value: "< 7.0 或 > 20.0 g/dL", note: "HIS/LIS 系統須觸發緊急異常警示" }
+        ],
+        matrixHeaders: ["臨床狀態與分類", "檢驗數值特徵", "常見生理或病理原因", "臨床與系統處置建議"],
+        matrixRows: [
+          {
+            statusText: "小球性貧血 (偏低)",
+            badgeClass: "badge-alert",
+            spec: "Hb 偏低 + MCV < 80 fL",
+            meaning: "常見於缺鐵性貧血（IDA）、海洋性貧血（Thalassemia）或慢性疾病晚期。",
+            action: "建議加驗 Ferritin（鐵蛋白）、TIBC；若 Mentzer Index < 13 優先排查海洋性貧血。"
+          },
+          {
+            statusText: "正球性貧血 (偏低)",
+            badgeClass: "badge-warn",
+            spec: "Hb 偏低 + MCV 80 - 100 fL",
+            meaning: "急性出血、溶血性貧血、慢性腎臟病（EPO 生成不足）或慢性發炎疾病。",
+            action: "搭配網狀紅血球（Reticulocyte）評估骨髓造血代償能力，並檢查腎功能（eGFR）。"
+          },
+          {
+            statusText: "大球性貧血 (偏低)",
+            badgeClass: "badge-warn",
+            spec: "Hb 偏低 + MCV > 100 fL",
+            meaning: "維生素 B12 或葉酸（Folate）缺乏導致之巨母紅血球性貧血、肝病或甲狀腺低下。",
+            action: "檢驗血清 Vitamin B12 與 Folate 濃度，並詢問飲食史、胃部手術史或飲酒史。"
+          },
+          {
+            statusText: "血紅素偏高 (異常升高)",
+            badgeClass: "badge-alert",
+            spec: "男 > 17.5 / 女 > 15.5 g/dL",
+            meaning: "相對性升高（嚴重脫水、燒傷血液濃縮）或絕對性增多（慢性低血氧 COPD、真性紅血球增多症 PV）。",
+            action: "先排除脫水因素；若持續偏高且伴隨血氧偏低或脾腫大，需檢測 EPO 濃度與 JAK2 基因突變。"
+          }
+        ],
+        qas: [
+          {
+            q: "Q1：為什麼單看血紅素（Hb）數值不夠，臨床系統常將 Hb、Hct 與 MCV 綁定成組合判讀？",
+            a: "因為 Hb 僅反映血液中血紅素的濃度，無法區分紅血球「體積大小」與「製造原料問題」。結合血比容（Hct）可評估血液濃縮程度，而 MCV（平均紅血球體積）則能將貧血精準拆分為小球性、正球性與大球性三大路徑，大幅縮小後續檢驗開單範圍。"
+          },
+          {
+            q: "Q2：在醫院資訊系統（HIS）設計檢驗自動提示時，針對 Hb 異常應注意哪些假性干擾？",
+            a: "嚴重脫水或使用利尿劑的病人會因血漿容積減少，導致 Hb 出現「假性正常」或「假性偏高」；相反地，懷孕中後期的生理性血液稀釋與大量靜脈輸液，則會造成 Hb 相對下降。因此 CDSS 規則應納入病患體液狀態與孕期標記。"
+          }
+        ]
+      },
+      {
+        id: "policy-cns15390",
+        categoryKey: "policy",
+        categoryName: "醫管與輔具法規",
+        title: "CNS 15390 輔具分類標準與台灣輔具補助評估邏輯",
+        updatedAt: "2026-11-16",
+        tags: ["CNS15390", "ISO9999", "長照2.0輔具補助", "身心障礙輔具"],
+        definition: "CNS 15390 為台灣參照國際標準 ISO 9999 所制定的「身心障礙者輔具—分類與術語」國家標準。採用三階層（主分類、次分類、細分類）六位碼架構，是建置台灣輔具補助諮詢系統、長照 2.0 給付核銷與醫院出院準備服務輔具媒合的核心資料標準。",
+        metrics: [
+          { label: "標準階層編碼結構", value: "3 階層 / 6 位碼", note: "格式如 12 03 03（單臂操作步行輔具）" },
+          { label: "長照 2.0 租購補助額度", value: "40,000 元 / 3 年", note: "含居家無障礙環境改善與輔具租購" },
+          { label: "身障輔具補助年限規定", value: "2 年 / 4 項為原則", note: "需依各縣市輔具中心甲類/乙類評估報告核定" }
+        ],
+        matrixHeaders: ["補助制度管道", "適用對象資格", "負擔比例與補助上限", "資訊系統檢核與申請要點"],
+        matrixRows: [
+          {
+            statusText: "長照 2.0 輔具服務 (E碼/F碼)",
+            badgeClass: "badge-normal",
+            spec: "每 3 年共用額度上限 40,000 元",
+            meaning: "適用於 65 歲以上失能長者、55 歲以上失能原住民、50 歲以上失智症者及領有身障證明之失能者（CMS 2~8 級）。",
+            action: "系統需檢核長照需要等級（CMS >= 2），並依一般戶（自付30%）、中低收（自付10%）、低收（免自付）試算差額。"
+          },
+          {
+            statusText: "身心障礙者生活輔具補助",
+            badgeClass: "badge-normal",
+            spec: "每人每 2 年以補助 4 項為原則",
+            meaning: "適用於領有身心障礙證明，且符合各輔具項目對應之障礙類別與向度（ICF 碼）者。",
+            action: "必須遵守「先核定、後購買」鐵則！未取得社會局核定公文前先行購買並開立發票者，系統應提示不予核銷。"
+          },
+          {
+            statusText: "雙管道擇一申領限制",
+            badgeClass: "badge-warn",
+            spec: "同一輔具項目不得重複請領",
+            meaning: "同時具備「身障證明」與「長照 2.0 失能資格」的民眾，針對同一功能之輔具僅能擇優選擇一管道申請。",
+            action: "在設計輔具補助聊天機器人時，應先比對項目是否屬於長照給付清單，並試算兩管道之自付額供家屬決策。"
+          }
+        ],
+        qas: [
+          {
+            q: "Q1：為什麼民眾最常發生「買了輪椅卻領不到補助」的爭議？系統流程該如何防呆？",
+            a: "台灣輔具補助採嚴格的「事前申請制」。多數項目（須評估項目）必須先經由輔具中心治療師（甲類評估人員）完成評估、送交縣市政府核發「核定公文」後，才能購買並開立核定日期之後的統一發票。系統在對話第一階段就應置頂提醒「切勿先買開發票」。"
+          },
+          {
+            q: "Q2：CNS 15390 編碼如何幫助醫療資訊系統整合不同機關的輔具資料？",
+            a: "衛福部社家署（身障輔具）、長照司（長照輔具）與勞保局（職務再設計/職災輔具）各自有補助基準表，但底層皆對應或參考 CNS 15390 分類邏輯。以標準編碼作為知識庫的主鍵（Primary Key），能避免俗名不同（如『助行器』與『四腳拐』）造成的檢索遺漏。"
+          }
+        ]
+      },
+      {
+        id: "ai-rag-healthcare",
+        categoryKey: "ai",
+        categoryName: "智慧醫療技術",
+        title: "檢索增強生成（RAG）於醫療與社福諮詢機器人之架構設計",
+        updatedAt: "2026-11-16",
+        tags: ["RAG檢索增強生成", "LineBot醫療應用", "降低AI幻覺", "向量資料庫"],
+        definition: "檢索增強生成（Retrieval-Augmented Generation, RAG）是結合「外部權威知識庫檢索」與「大型語言模型（LLM）生成能力」的系統架構。在醫療衛教與法規補助諮詢場景中，RAG 能強制模型僅根據最新官方補助基準表與臨床指引回答，有效解決通用 LLM 產生金額錯誤或醫療幻覺（Hallucination）的風險。",
+        metrics: [
+          { label: "知識庫文件切塊大小", value: "300 - 600 Tokens", note: "搭配結構化 Markdown 表格保留完整語意" },
+          { label: "檢索召回策略 (Top-K)", value: "Top-K = 3 ~ 5", note: "結合語意向量檢索與法規代碼關鍵字混合搜尋" },
+          { label: "幻覺防護機制", value: "System Prompt 邊界約束", note: "查無依據時強制回覆標準轉介資訊，禁止猜測" }
+        ],
+        matrixHeaders: ["RAG 系統處理階段", "核心技術規格與元件", "在醫療/輔具諮詢中的作用", "常見錯誤與最佳化對策"],
+        matrixRows: [
+          {
+            statusText: "1. 資料前處理與切塊 (Chunking)",
+            badgeClass: "badge-normal",
+            spec: "Markdown 結構化切塊 + Metadata 標註",
+            meaning: "將 PDF 法規基準表轉為結構化 Markdown 或 JSON，確保「輔具名稱、最高補助額、評估規定」不會被切成兩半。",
+            action: "切勿對跨頁表格直接使用固定字數切割；應以「單一補助項目」為最小知識單元並加上分類 Metadata。"
+          },
+          {
+            statusText: "2. 混合檢索 (Hybrid Search)",
+            badgeClass: "badge-normal",
+            spec: "Dense Embedding + BM25 關鍵字檢索",
+            meaning: "同時理解口語描述（如「阿公半邊沒力走路不穩」）與精準專有名詞（如「氣墊床 B 款」、「CMS 第 4 級」）。",
+            action: "在查詢進入向量庫前，先透過 Query Rewriting 將民眾口語轉換為標準醫療/輔具術語，大幅提升召回率。"
+          },
+          {
+            statusText: "3. 生成與護欄控管 (Generation)",
+            badgeClass: "badge-warn",
+            spec: "低溫度參數 (Temperature <= 0.2) + 來源引用",
+            meaning: "要求模型嚴格依照檢索出的法規條文合成白話回覆，並在文末標註資料來源與評估單位聯絡方式。",
+            action: "若使用者詢問涉及具體醫療診斷或處方開立，觸發安全護欄（Guardrails）並導引至專科醫師門診。"
+          }
+        ],
+        qas: [
+          {
+            q: "Q1：為什麼在輔具補助或醫院衛教 Line Bot 中，選擇 RAG 架構比直接微調（Fine-tuning）模型更合適？",
+            a: "第一，各縣市補助規定與醫療衛教指引每年都會微調更新，RAG 只需更新底層 Markdown/JSON 知識庫檔案即可即時生效，無需耗費算力重新訓練模型；第二，RAG 可提供明確的『條文出處（Citation）』，方便個管師與民眾查證，符合醫療資訊系統對可解釋性的高標準要求。"
+          },
+          {
+            q: "Q2：如何把這套 AGENTS.md 的知識庫精神與 RAG 結合？",
+            a: "當網站每一篇講義都嚴格遵循 AGENTS.md 的『三段式結構（定義、規格表、QA）』與統一命名時，這些網頁本身就是品質極高的結構化語料（Corpus），可直接匯出作為 RAG 向量資料庫的知識來源，達成『人類好讀、AI 好檢索』的雙重效益。"
+          }
+        ]
+      }
+    ];
+
+    const CATEGORY_GROUPS = [
+      { key: "lab", title: "🧪 臨床檢驗判讀 (lab-*)" },
+      { key: "policy", title: "📋 醫管與輔具法規 (policy-*)" },
+      { key: "ai", title: "🤖 智慧醫療技術 (ai-*)" }
+    ];
+
+    let currentLessonId = WIKI_LESSONS[0].id;
+
+    // 渲染左側導覽列
+    function renderSidebar(filterText = "") {
+      const navEl = document.getElementById("sidebarNav");
+      const keyword = filterText.trim().toLowerCase();
+      let html = "";
+
+      CATEGORY_GROUPS.forEach(group => {
+        const items = WIKI_LESSONS.filter(item => {
+          if (item.categoryKey !== group.key) return false;
+          if (!keyword) return true;
+          return (
+            item.title.toLowerCase().includes(keyword) ||
+            item.id.toLowerCase().includes(keyword) ||
+            item.tags.some(t => t.toLowerCase().includes(keyword))
+          );
+        });
+
+        if (items.length > 0) {
+          html += `<div class="nav-group-title">${group.title}</div><ul class="nav-list">`;
+          items.forEach(item => {
+            const activeClass = item.id === currentLessonId ? "active" : "";
+            html += `
+              <li>
+                <button type="button" class="nav-item-btn ${activeClass}" onclick="selectLesson('${item.id}')">
+                  <span>${item.title}</span>
+                  <span class="nav-item-id mono">${item.id}</span>
+                </button>
+              </li>
+            `;
+          });
+          html += `</ul>`;
+        }
+      });
+
+      navEl.innerHTML = html || `<div style="padding:12px;color:#94a3b8;font-size:0.85rem;">找不到符合「${filterText}」的單元</div>`; document.getElementById("lessonCountPill").textContent = `已收錄 ${WIKI_LESSONS.length} 篇標準單元`;
+    }
+
+    // 嚴格依據 AGENTS.md 第 4 節渲染四大標準 DOM 區塊
+    function renderLesson(lessonId) {
+      const lesson = WIKI_LESSONS.find(item => item.id === lessonId) || WIKI_LESSONS[0];
+      currentLessonId = lesson.id;
+
+      const tagsHtml = lesson.tags.map(t => `<span class="tag-chip">#${t}</span>`).join(" ");
+      const metricsHtml = lesson.metrics.map(m => `
+        <div class="metric-card">
+          <div class="metric-label">${m.label}</div>
+          <div class="metric-value">${m.value}</div>
+          <div class="metric-note">${m.note}</div>
+        </div>
+      `).join("");
+
+      const headersHtml = lesson.matrixHeaders.map(h => `<th>${h}</th>`).join("");
+      const rowsHtml = lesson.matrixRows.map(r => `
+        <tr>
+          <td><span class="${r.badgeClass}">${r.statusText}</span></td>
+          <td class="mono">${r.spec}</td>
+          <td>${r.meaning}</td>
+          <td>${r.action}</td>
+        </tr>
+      `).join("");
+
+      const qaHtml = lesson.qas.map(item => `
+        <div class="qa-item">
+          <div class="qa-question">${item.q}</div>
+          <div class="qa-answer">${item.a}</div>
+        </div>
+      `).join("");
+
+      const container = document.getElementById("lessonContainer");
+      container.innerHTML = `
+        <!-- 區塊 A：單元標頭區 (.lesson-header) -->
+        <header class="lesson-header" data-spec="區塊 A (.lesson-header) - 標頭與元資料規範">
+          <span class="category-badge">${lesson.categoryName}</span>
+          <h1 class="lesson-title">${lesson.title}</h1>
+          <div class="lesson-meta">
+            <span>單元 ID：<code class="mono">${lesson.id}</code></span>
+            <span>最後更新：<code class="mono">${lesson.updatedAt}</code></span>
+            <div>${tagsHtml}</div>
+          </div>
+        </header>
+
+        <!-- 區塊 B：核心定義與背景卡 (.section-definition) -->
+        <section class="section-definition" data-spec="區塊 B (.section-definition) - 核心定義卡 + 3 個指標小卡 (.metric-grid)">
+          <h2 class="section-heading">📌 一、核心定義與臨床／實務重要性</h2>
+          <div class="callout-card">${lesson.definition}</div>
+          <div class="metric-grid">${metricsHtml}</div>
+        </section>
+
+        <!-- 區塊 C：結構化判讀／比較矩陣表 (.section-matrix) -->
+        <section class="section-matrix" data-spec="區塊 C (.section-matrix) - 4 欄結構化表格 (.wiki-table) 與狀態標籤">
+          <h2 class="section-heading">📊 二、結構化判讀與規格對照矩陣</h2>
+          <table class="wiki-table">
+            <thead>
+              <tr>${headersHtml}</tr>
+            </thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+        </section>
+
+        <!-- 區塊 D：實務常見問題與延伸應用 (.section-qa) -->
+        <section class="section-qa" data-spec="區塊 D (.section-qa) - 實務常見問題與延伸應用 (.qa-item)">
+          <h2 class="section-heading">💡 三、實務常見問題與系統設計 QA</h2>
+          ${qaHtml}
+        </section>
+      `;
+
+      renderSidebar(document.getElementById("searchInput").value);
+    }
+
+    function selectLesson(id) {
+      renderLesson(id);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // 搜尋欄事件
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+      renderSidebar(e.target.value);
+    });
+
+    // 切換顯示 AGENTS.md 結構對應標籤
+    document.getElementById("toggleSpecBtn").addEventListener("click", (e) => {
+      document.body.classList.toggle("show-spec-tags");
+      const isShowing = document.body.classList.contains("show-spec-tags");
+      e.target.textContent = isShowing
+        ? "✅ 隱藏 AGENTS.md 區塊對應標籤"
+        : "🔍 顯示 AGENTS.md 區塊對應標籤";
+    });
+
+    // 初始載入
+    renderLesson(currentLessonId);
+  </script>
+</body>
+</html>
